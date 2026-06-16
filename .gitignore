@@ -1,0 +1,31 @@
+# Java / Maven / Gradle
+target/
+build/
+*.class
+*.jar
+*.war
+*.ear
+*.iml
+
+# IDE
+.idea/
+*.ipr
+*.iws
+.vscode/
+
+# Secrets & local config
+.env
+.env.local
+application-local.properties
+application-dev.properties
+
+# Logs
+*.log
+logs/
+
+# Test results
+surefire-reports/
+
+# OS
+Thumbs.db
+.DS_Store
