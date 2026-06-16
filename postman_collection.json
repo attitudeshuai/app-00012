@@ -1,0 +1,914 @@
+{
+  "info": {
+    "name": "ToolShare API 测试集合",
+    "description": "社区工具共享箱后端系统API测试集合",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8082",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. 认证模块",
+      "item": [
+        {
+          "name": "用户注册",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"test@example.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"注册成功\", function() {\n",
+                  "  pm.response.to.have.status(200);\n",
+                  "  var jsonData = pm.response.json();\n",
+                  "  pm.expect(jsonData.code).to.eql(200);\n",
+                  "  pm.expect(jsonData.data).to.have.property(\"token\");\n",
+                  "  pm.expect(jsonData.data).to.have.property(\"user\");\n",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "管理员登录",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"登录成功\", function() {\n",
+                  "  pm.response.to.have.status(200);\n",
+                  "  var jsonData = pm.response.json();\n",
+                  "  pm.expect(jsonData.code).to.eql(200);\n",
+                  "  pm.expect(jsonData.data).to.have.property(\"token\");\n",
+                  "  pm.collectionVariables.set(\"adminToken\", jsonData.data.token);\n",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "普通用户登录",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"zhangsan\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"登录成功\", function() {\n",
+                  "  pm.response.to.have.status(200);\n",
+                  "  var jsonData = pm.response.json();\n",
+                  "  pm.expect(jsonData.code).to.eql(200);\n",
+                  "  pm.expect(jsonData.data).to.have.property(\"token\");\n",
+                  "  pm.collectionVariables.set(\"userToken\", jsonData.data.token);\n",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "获取当前用户信息",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "me"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"获取用户信息成功\", function() {\n",
+                  "  pm.response.to.have.status(200);\n",
+                  "  var jsonData = pm.response.json();\n",
+                  "  pm.expect(jsonData.code).to.eql(200);\n",
+                  "  pm.expect(jsonData.data.username).to.eql(\"admin\");\n",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "更新个人信息",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"avatar\": \"https://example.com/avatar.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "me"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"更新信息成功\", function() {\n",
+                  "  pm.response.to.have.status(200);\n",
+                  "  var jsonData = pm.response.json();\n",
+                  "  pm.expect(jsonData.code).to.eql(200);\n",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "未登录访问受限资源",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "me"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"未登录返回401\", function() {\n",
+                  "  pm.response.to.have.status(401);\n",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. 工具箱管理",
+      "item": [
+        {
+          "name": "获取工具箱列表",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/toolboxes?page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "toolboxes"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"获取工具箱列表成功\", function() {\n",
+                  "  pm.response.to.have.status(200);\n",
+                  "  var jsonData = pm.response.json();\n",
+                  "  pm.expect(jsonData.code).to.eql(200);\n",
+                  "  pm.expect(jsonData.data).to.have.property(\"content\");\n",
+                  "  pm.expect(jsonData.data.content).to.be.an(\"array\");\n",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "创建工具箱",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"测试工具箱\",\n  \"location\": \"测试位置\",\n  \"code\": \"TEST001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/toolboxes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "toolboxes"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"创建工具箱成功\", function() {\n",
+                  "  pm.response.to.have.status(200);\n",
+                  "  var jsonData = pm.response.json();\n",
+                  "  pm.expect(jsonData.code).to.eql(200);\n",
+                  "  pm.expect(jsonData.data.name).to.eql(\"测试工具箱\");\n",
+                  "  pm.collectionVariables.set(\"toolBoxId\", jsonData.data.id);\n",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "获取工具箱详情",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/toolboxes/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "toolboxes", "1"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"获取工具箱详情成功\", function() {\n",
+                  "  pm.response.to.have.status(200);\n",
+                  "  var jsonData = pm.response.json();\n",
+                  "  pm.expect(jsonData.code).to.eql(200);\n",
+                  "  pm.expect(jsonData.data).to.have.property(\"name\");\n",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "更新工具箱",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"更新后的工具箱\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/toolboxes/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "toolboxes", "1"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"更新工具箱成功\", function() {\n",
+                  "  pm.response.to.have.status(200);\n",
+                  "  var jsonData = pm.response.json();\n",
+                  "  pm.expect(jsonData.code).to.eql(200);\n",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. 工具管理",
+      "item": [
+        {
+          "name": "获取工具列表",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tools?page=0&size=10&status=AVAILABLE",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tools"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "AVAILABLE"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"获取工具列表成功\", function() {\n",
+                  "  pm.response.to.have.status(200);\n",
+                  "  var jsonData = pm.response.json();\n",
+                  "  pm.expect(jsonData.code).to.eql(200);\n",
+                  "  pm.expect(jsonData.data).to.have.property(\"content\");\n",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "创建工具",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"boxId\": 1,\n  \"name\": \"测试工具\",\n  \"category\": \"测试分类\",\n  \"description\": \"这是一个测试工具\",\n  \"purchaseDate\": \"2024-01-01\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tools",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tools"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"创建工具成功\", function() {\n",
+                  "  pm.response.to.have.status(200);\n",
+                  "  var jsonData = pm.response.json();\n",
+                  "  pm.expect(jsonData.code).to.eql(200);\n",
+                  "  pm.expect(jsonData.data.name).to.eql(\"测试工具\");\n",
+                  "  pm.collectionVariables.set(\"toolId\", jsonData.data.id);\n",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "获取工具详情",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tools/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tools", "1"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"获取工具详情成功\", function() {\n",
+                  "  pm.response.to.have.status(200);\n",
+                  "  var jsonData = pm.response.json();\n",
+                  "  pm.expect(jsonData.code).to.eql(200);\n",
+                  "  pm.expect(jsonData.data).to.have.property(\"name\");\n",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "获取我发布的工具",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tools/mine",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tools", "mine"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"获取我的工具成功\", function() {\n",
+                  "  pm.response.to.have.status(200);\n",
+                  "  var jsonData = pm.response.json();\n",
+                  "  pm.expect(jsonData.code).to.eql(200);\n",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "修改工具状态",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"MAINTENANCE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tools/1/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tools", "1", "status"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"修改工具状态成功\", function() {\n",
+                  "  pm.response.to.have.status(200);\n",
+                  "  var jsonData = pm.response.json();\n",
+                  "  pm.expect(jsonData.code).to.eql(200);\n",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. 借用申请管理",
+      "item": [
+        {
+          "name": "获取借用申请列表",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/borrowrequests?page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "borrowrequests"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"获取借用申请列表成功\", function() {\n",
+                  "  pm.response.to.have.status(200);\n",
+                  "  var jsonData = pm.response.json();\n",
+                  "  pm.expect(jsonData.code).to.eql(200);\n",
+                  "  pm.expect(jsonData.data).to.have.property(\"content\");\n",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "创建借用申请",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"toolId\": 2,\n  \"startDate\": \"2024-02-01\",\n  \"expectedReturnDate\": \"2024-02-05\",\n  \"remark\": \"测试借用申请\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/borrowrequests",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "borrowrequests"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"创建借用申请成功\", function() {\n",
+                  "  pm.response.to.have.status(200);\n",
+                  "  var jsonData = pm.response.json();\n",
+                  "  pm.expect(jsonData.code).to.eql(200);\n",
+                  "  pm.expect(jsonData.data.status).to.eql(\"PENDING\");\n",
+                  "  pm.collectionVariables.set(\"borrowRequestId\", jsonData.data.id);\n",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "获取我的借用申请",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{userToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/borrowrequests/mine",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "borrowrequests", "mine"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"获取我的借用申请成功\", function() {\n",
+                  "  pm.response.to.have.status(200);\n",
+                  "  var jsonData = pm.response.json();\n",
+                  "  pm.expect(jsonData.code).to.eql(200);\n",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "获取借用申请详情",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/borrowrequests/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "borrowrequests", "1"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"获取借用申请详情成功\", function() {\n",
+                  "  pm.response.to.have.status(200);\n",
+                  "  var jsonData = pm.response.json();\n",
+                  "  pm.expect(jsonData.code).to.eql(200);\n",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5. 使用日志管理",
+      "item": [
+        {
+          "name": "获取使用日志列表",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/toollogs?page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "toollogs"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"获取使用日志列表成功\", function() {\n",
+                  "  pm.response.to.have.status(200);\n",
+                  "  var jsonData = pm.response.json();\n",
+                  "  pm.expect(jsonData.code).to.eql(200);\n",
+                  "  pm.expect(jsonData.data).to.have.property(\"content\");\n",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "获取我的使用日志",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/toollogs/mine",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "toollogs", "mine"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"获取我的使用日志成功\", function() {\n",
+                  "  pm.response.to.have.status(200);\n",
+                  "  var jsonData = pm.response.json();\n",
+                  "  pm.expect(jsonData.code).to.eql(200);\n",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "6. 统计模块",
+      "item": [
+        {
+          "name": "总览统计",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/stats/overview",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "stats", "overview"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"获取总览统计成功\", function() {\n",
+                  "  pm.response.to.have.status(200);\n",
+                  "  var jsonData = pm.response.json();\n",
+                  "  pm.expect(jsonData.code).to.eql(200);\n",
+                  "  pm.expect(jsonData.data).to.have.property(\"totalUsers\");\n",
+                  "  pm.expect(jsonData.data).to.have.property(\"totalTools\");\n",
+                  "  pm.expect(jsonData.data).to.have.property(\"totalToolBoxes\");\n",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "趋势统计",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/stats/trend",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "stats", "trend"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"获取趋势统计成功\", function() {\n",
+                  "  pm.response.to.have.status(200);\n",
+                  "  var jsonData = pm.response.json();\n",
+                  "  pm.expect(jsonData.code).to.eql(200);\n",
+                  "  pm.expect(jsonData.data).to.have.property(\"startDate\");\n",
+                  "  pm.expect(jsonData.data).to.have.property(\"endDate\");\n",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
